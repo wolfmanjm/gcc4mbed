@@ -22,7 +22,7 @@
         .arm
 
 
-        .global __main
+        .global vectors
         .global __mbed_reset
         .global __mbed_undef
         .global __mbed_swi
@@ -34,7 +34,7 @@
 ;
 
 
-_start:
+vectors:
         LDR PC, =__mbed_reset
         LDR PC, =__mbed_undef
         LDR PC, =__mbed_swi

@@ -70,7 +70,10 @@ endif
 OBJECTS := $(call srcs2objs,$(call recurse_dir,$(SRC)),$(SRC),$(OUTDIR))
 
 # Add in the GCC4MBED stubs which allow hooking in the MRI debug monitor.
+# NOTE: Not doing this for ARM7TDMI parts though.  Just Cortex-M parts.
+ifneq "$(findstring -DTARGET_ARM7,$(GCC_DEFINES))" "-DTARGET_ARM7"
 OBJECTS += $(OUTDIR)/gcc4mbed.o
+endif
 
 # Initialize list of the header dependency files, one per object file. Each mbed SDK library will append to this list.
 DEPFILES := $(patsubst %.o,%.d,$(OBJECTS))
@@ -115,9 +118,16 @@ else
 MRI_WRAPS :=
 endif
 
+# Only use function wraps for Cortex-M parts.
+ifeq "$(findstring -DTARGET_ARM7,$(GCC_DEFINES))" "-DTARGET_ARM7"
+DEVICE_WRAPS :=
+else
+DEVICE_WRAPS := ,--wrap=_isatty,--wrap=malloc,--wrap=realloc,--wrap=free
+endif
+
 # Linker Options.
 $(MBED_DEVICE): LD_FLAGS := $(LD_FLAGS) -specs=$(GCC4MBED_DIR)/build/startfile.spec
-$(MBED_DEVICE): LD_FLAGS += -Wl,-Map=$(OUTDIR)/$(PROJECT).map,--cref,--gc-sections,--wrap=_isatty,--wrap=malloc,--wrap=realloc,--wrap=free$(MRI_WRAPS)
+$(MBED_DEVICE): LD_FLAGS += -Wl,-Map=$(OUTDIR)/$(PROJECT).map,--cref,--gc-sections$(DEVICE_WRAPS)$(MRI_WRAPS)
 ifneq "$(NO_FLOAT_SCANF)" "1"
 $(MBED_DEVICE): LD_FLAGS += -u _scanf_float
 endif
