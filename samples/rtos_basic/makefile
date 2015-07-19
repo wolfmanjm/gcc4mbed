@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 PROJECT         := rtos_basic
-DEVICES         := LPC1768 LPC11U24 LPC4330_M4 KL25Z NUCLEO_F401RE NUCLEO_F411RE
+#DEVICES         := LPC1768 LPC11U24 LPC4330_M4 KL25Z NUCLEO_F401RE NUCLEO_F411RE
+DEVICES         := LPC1768
 GCC4MBED_DIR    := ../..
 NO_FLOAT_SCANF  := 1
 NO_FLOAT_PRINTF := 1
