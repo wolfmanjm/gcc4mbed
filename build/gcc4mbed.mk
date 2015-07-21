@@ -158,7 +158,8 @@ endif
 
 MRI_INIT_PARAMETERS := $(MRI_UART)
 
-TOOLPATH := $(GCC4MBED_DIR)/gcc-arm-none-eabi/bin
+TOOLPATH ?= $(GCC4MBED_DIR)/gcc-arm-none-eabi/bin
+
 #  Compiler/Assembler/Linker Paths
 GCC     := $(TOOLPATH)/arm-none-eabi-gcc
 GPP     := $(TOOLPATH)/arm-none-eabi-g++
