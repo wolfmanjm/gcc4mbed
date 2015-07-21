@@ -505,6 +505,23 @@ uint32_t SystemCoreClock = __CORE_CLK;/*!< System Clock Frequency (Core Clock)*/
 
 }
 
+#define SUPPORT_120MHZ
+#ifdef SUPPORT_120MHZ
+// detect 17x[4-8] (100MHz) or 17x9 (120MHz)
+static int can_120MHz() {
+#define IAP_LOCATION 0x1FFF1FF1
+	uint32_t command[1];
+	uint32_t result[5];
+	typedef void (*IAP)(uint32_t*, uint32_t*);
+	IAP iap = (IAP) IAP_LOCATION;
+
+	command[0] = 54;
+	iap(command, result);
+
+	return result[1] & 0x00100000;
+}
+#endif
+
 /**
  * Initialize the system
  *
@@ -532,10 +549,23 @@ void SystemInit (void)
 #if (PLL0_SETUP)
   LPC_SC->CLKSRCSEL = CLKSRCSEL_Val;    /* Select Clock Source for PLL0       */
 
+#ifdef SUPPORT_120MHZ
+  if(can_120MHz()) {
+	  LPC_SC->PLL0CFG   = 0x0000000E;     /* configure PLL0                     */
+	  LPC_SC->PLL0FEED  = 0xAA;
+	  LPC_SC->PLL0FEED  = 0x55;
+  } else {
+//     LPC_SC->PLL0CFG   = 0x0000000B;  // 96MHz
+	  LPC_SC->PLL0CFG   = 0x00010018;     // 100MHz
+	  LPC_SC->PLL0FEED  = 0xAA;
+	  LPC_SC->PLL0FEED  = 0x55;
+  }
+#else
   LPC_SC->PLL0CFG   = PLL0CFG_Val;      /* configure PLL0                     */
   LPC_SC->PLL0FEED  = 0xAA;
   LPC_SC->PLL0FEED  = 0x55;
-
+#endif
+  
   LPC_SC->PLL0CON   = 0x01;             /* PLL0 Enable                        */
   LPC_SC->PLL0FEED  = 0xAA;
   LPC_SC->PLL0FEED  = 0x55;
@@ -564,6 +594,9 @@ void SystemInit (void)
 #else
   LPC_SC->USBCLKCFG = USBCLKCFG_Val;    /* Setup USB Clock Divider            */
 #endif
+
+  // this sets up {global uint32 SystemCoreClock} with the new speed
+  SystemCoreClockUpdate();
 
   LPC_SC->PCONP     = PCONP_Val;        /* Power Control for Peripherals      */
 
