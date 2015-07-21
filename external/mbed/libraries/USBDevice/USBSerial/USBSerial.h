@@ -57,7 +57,8 @@ public:
     *
     */
     USBSerial(uint16_t vendor_id = 0x1f00, uint16_t product_id = 0x2012, uint16_t product_release = 0x0001, bool connect_blocking = true): USBCDC(vendor_id, product_id, product_release, connect_blocking){
-        settingsChangedCallback = 0;
+		settingsChangedCallback = 0;
+		connectionChangedCallback= 0;
     };
 
 
@@ -144,18 +145,34 @@ public:
         settingsChangedCallback = fptr;
     }
 
+	/**
+     * Attach a callback to call when the connection status changes.
+     *
+     * @param fptr function pointer
+     */
+	void attach(void (*fptr)(bool connected)) {
+		connectionChangedCallback = fptr;
+	}
+
 protected:
     virtual bool EPBULK_OUT_callback();
     virtual void lineCodingChanged(int baud, int bits, int parity, int stop){
         if (settingsChangedCallback) {
             settingsChangedCallback(baud, bits, parity, stop);
         }
-    }
+	}
+	virtual void connectionChanged(bool connected){
+		if (connectionChangedCallback) {
+			connectionChangedCallback(connected);
+		}
+	}
+	
 
 private:
     FunctionPointer rx;
     CircBuffer<uint8_t,128> buf;
-    void (*settingsChangedCallback)(int baud, int bits, int parity, int stop);
+	void (*settingsChangedCallback)(int baud, int bits, int parity, int stop);
+	void (*connectionChangedCallback)(bool connected);
 };
 
 #endif

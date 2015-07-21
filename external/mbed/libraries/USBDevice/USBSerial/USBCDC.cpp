@@ -64,7 +64,8 @@ bool USBCDC::USBCallback_request(void) {
                     terminal_connected = true;
                 } else {
                     terminal_connected = false;
-                }
+				}
+				connectionChanged(terminal_connected);
                 success = true;
                 break;
             default:

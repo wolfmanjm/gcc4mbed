@@ -112,6 +112,14 @@ protected:
     */
     virtual void lineCodingChanged(int baud, int bits, int parity, int stop) {};
 
+	/*
+    * Called by USBCallback_request when CDC connection changes
+    * Warning: Called in ISR
+    *
+    * @param connected
+    */
+	virtual void connectionChanged(bool connected) {};
+
 protected:
     virtual bool USBCallback_request();
     virtual void USBCallback_requestCompleted(uint8_t *buf, uint32_t length);
