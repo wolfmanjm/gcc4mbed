@@ -371,15 +371,15 @@ USBHAL::USBHAL(void) {
     LPC_PINCON->PINSEL1 &= 0xc3ffffff;
     LPC_PINCON->PINSEL1 |= 0x14000000;
 
-    // Disconnect USB device
-    SIEdisconnect();
-
     // Configure pin P2.9 to be Connect
     LPC_PINCON->PINSEL4 &= 0xfffcffff;
     LPC_PINCON->PINSEL4 |= 0x00040000;
 
+	// Disconnect USB device
+	SIEdisconnect();
+
     // Connect must be low for at least 2.5uS
-    wait(0.3);
+    wait_ms(1000);
 
     // Set the maximum packet size for the control endpoints
     realiseEndpoint(EP0IN, MAX_PACKET_SIZE_EP0, 0);

@@ -292,6 +292,8 @@
   @{
  */
 
+#define SUPPORT_120MHZ
+
 #define CLOCK_SETUP           1
 #define SCS_Val               0x00000020
 #define CLKSRCSEL_Val         0x00000001
@@ -305,8 +307,12 @@
 #    define USBCLKCFG_Val         0x00000000
 #else
 #    define PLL0CFG_Val           0x0000000B
+#ifdef SUPPORT_120MHZ
+#    define PLL1_SETUP            1
+#else
 #    define PLL1_SETUP            0
-#    define PLL1CFG_Val           0x00000000
+#endif
+#    define PLL1CFG_Val           0x00000023
 #    define CCLKCFG_Val           0x00000002
 #    define USBCLKCFG_Val         0x00000005
 #endif
@@ -505,7 +511,6 @@ uint32_t SystemCoreClock = __CORE_CLK;/*!< System Clock Frequency (Core Clock)*/
 
 }
 
-#define SUPPORT_120MHZ
 #ifdef SUPPORT_120MHZ
 // detect 17x[4-8] (100MHz) or 17x9 (120MHz)
 static int can_120MHz() {
